@@ -37,6 +37,11 @@ from nerfstudio.utils import colormaps, install_checks
 from nerfstudio.utils.eval_utils import eval_setup
 from nerfstudio.utils.rich_utils import ItersPerSecColumn
 from nerfstudio.viewer.server.utils import three_js_perspective_camera_focal_length
+import platform
+import pathlib
+plt = platform.system()
+if plt == 'Windows':
+   pathlib.PosixPath = pathlib.WindowsPath
 
 CONSOLE = Console(width=120)
 
