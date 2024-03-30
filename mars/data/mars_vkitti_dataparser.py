@@ -317,7 +317,7 @@ class MarsVKittiDataParserConfig(DataParserConfig):
 
     _target: Type = field(default_factory=lambda: MarsVKittiParser)
     """target class to instantiate"""
-    data: Path = Path("/data1/vkitti/Scene06/clone")
+    data: Path = Path("/data/vkitti/Scene06/clone")
     """Directory specifying location of data."""
     scale_factor: float = 0.1
     """How much to scale the camera origins by."""
@@ -618,6 +618,8 @@ class MarsVKittiParser(DataParser):
 
         if self.config.use_car_latents:
             if not self.config.car_object_latents_path.exists():
+                CONSOLE.print(self.config.car_object_latents_path)
+                CONSOLE.print(self.config.car_object_latents_path.exists())
                 CONSOLE.print("[yello]Error: latents not exist")
                 exit()
             car_latents = torch.load(str(self.config.car_object_latents_path))

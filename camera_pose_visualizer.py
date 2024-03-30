@@ -12,12 +12,15 @@ from nerfstudio.utils.rich_utils import CONSOLE
 
 import transforms3d
 
+from mars.data.mars_datamanager import MarsDataManagerConfig
+
 
 @dataclass
 class VisConfig(InstantiateConfig):
     _target: Type = field(default_factory=lambda: Runner)
     """Target class to instantiate."""
-    datamanager: VanillaDataManagerConfig = VanillaDataManagerConfig()
+    # datamanager: VanillaDataManagerConfig = VanillaDataManagerConfig()
+    datamanager: MarsDataManagerConfig = MarsDataManagerConfig()
     """Nerfstudio dataparser config"""
     image_downsample_factor: int = 5
     """the scale to down sample image when visualizing"""

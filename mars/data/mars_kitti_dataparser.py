@@ -840,7 +840,7 @@ def extract_object_information(args, visible_objects, objects_meta):
             if camera_objects >= 0 and not camera_objects in scene_objects:
                 # print(camera_objects, "in this scene")
                 scene_objects.append(camera_objects)
-    CONSOLE.log(f"{scene_objects} in this scene.")
+    # CONSOLE.log(f"{scene_objects} in this scene.")
 
     obj_properties = np.concatenate([obj_state[..., :3], obj_dir, track_row], axis=2)
 
@@ -1260,7 +1260,12 @@ class MarsKittiParser(DataParser):
         poses = poses[indices]
 
         if self.config.use_car_latents:
+            CONSOLE.print(self.config.car_object_latents_path)
+            CONSOLE.print(self.config.car_object_latents_path.exists())
+            print(self.config.car_object_latents_path)
             if not self.config.car_object_latents_path.exists():
+                CONSOLE.print(self.config.car_object_latents_path)
+                CONSOLE.print(self.config.car_object_latents_path.exists())
                 CONSOLE.print("[yello]Error: latents not exist")
                 exit()
             car_latents = torch.load(str(self.config.car_object_latents_path))

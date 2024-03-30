@@ -323,7 +323,7 @@ class RenderTrajectory:
             eval_num_rays_per_chunk=self.eval_num_rays_per_chunk,
             test_mode="inference",
         )
-
+        print(self.config.car_object_latents_path)
         install_checks.check_ffmpeg_installed()
 
         seconds = self.seconds
