@@ -910,7 +910,7 @@ class MarsKittiDataParserConfig(DataParserConfig):
     use_car_latents: bool = False
     car_object_latents_path: Optional[Path] = Path("data/kitti/car-object-latents/latent_codes05.pt")
     """path of car object latent codes"""
-    car_nerf_state_dict_path: Optional[Path] = Path("data/kitti/car-nerf-state-dict/car_nerf.ckpt")
+    car_nerf_state_dict_path: Optional[Path] = Path("data/kitti/car-nerf-state-dict/epoch_670.ckpt")
     """path of car nerf state dicts"""
     use_depth: bool = True
     """whether the training loop contains depth"""
