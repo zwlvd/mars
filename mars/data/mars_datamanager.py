@@ -12,7 +12,7 @@ from nerfstudio.data.datamanagers.base_datamanager import (
 )
 from mars.data.mars_dataset import MarsDataset
 
-
+# 实现datamanager
 @dataclass
 class MarsDataManagerConfig(VanillaDataManagerConfig):
     """A semantic datamanager - required to use with .setup()"""

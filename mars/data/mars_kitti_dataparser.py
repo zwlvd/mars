@@ -868,7 +868,7 @@ class MarsKittiDataParserConfig(DataParserConfig):
 
     _target: Type = field(default_factory=lambda: MarsKittiParser)
     """target class to instantiate"""
-    data: Path = Path("data/kitti/training/image_02/0006")
+    data: Path = Path("data/kitti/training/image_02/0005")
     """Directory specifying location of data."""
     scale_factor: float = 1
     """How much to scale the camera origins by."""
@@ -878,7 +878,7 @@ class MarsKittiDataParserConfig(DataParserConfig):
     """alpha color of background"""
     first_frame: int = 65
     """specifies the beginning of a sequence if not the complete scene is taken as Input"""
-    last_frame: int = 120
+    last_frame: int = 125
     """specifies the end of a sequence"""
     use_object_properties: bool = True
     """ use pose and properties of visible objects as an input """
@@ -908,9 +908,9 @@ class MarsKittiDataParserConfig(DataParserConfig):
     """Max number of object poses considered by the network, will be set automatically"""
     add_input_rows: int = -1
     use_car_latents: bool = False
-    car_object_latents_path: Optional[Path] = Path("pretrain/car_nerf/latent_codes.pt")
+    car_object_latents_path: Optional[Path] = Path("data/kitti/car-object-latents/latent_codes05.pt")
     """path of car object latent codes"""
-    car_nerf_state_dict_path: Optional[Path] = Path("pretrain/car_nerf/car_nerf.ckpt")
+    car_nerf_state_dict_path: Optional[Path] = Path("data/kitti/car-nerf-state-dict/car_nerf.ckpt")
     """path of car nerf state dicts"""
     use_depth: bool = True
     """whether the training loop contains depth"""
@@ -1333,4 +1333,5 @@ class MarsKittiParser(DataParser):
         return dataparser_outputs
 
 
+# 注册kitti的DataParserConfig
 KittiParserSpec = DataParserSpecification(config=MarsKittiDataParserConfig())

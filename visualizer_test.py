@@ -24,11 +24,11 @@ class VisConfig(InstantiateConfig):
     """Nerfstudio dataparser config"""
     image_downsample_factor: int = 5
     """the scale to down sample image when visualizing"""
-    skip_probability: float = 0.1
+    skip_probability: float = 0.8
     """the probability to skip a datapoint when visualizing"""
     image_plane: float = 1.0
     """the distance of the image plane from the camera center"""
-    selected_frames: Optional[Tuple[int, ...]] = None
+    selected_frames: Optional[Tuple[int, ...]] =  (0,5,6,8)
     """selected frame ids to visualize"""
     show_image: bool = False
     """whether to show the image in the visualization"""
@@ -36,6 +36,7 @@ class VisConfig(InstantiateConfig):
     """whether to show object boxes in the visualization"""
     up_axis: Literal["y", "z"] = "y"
     """On which axis apply object orientation yaw"""
+
 
 @dataclass
 class Runner:
@@ -48,16 +49,16 @@ class Runner:
         self.cameras = self.datamanager.train_dataparser_outputs.cameras
         self.image_filenames = self.datamanager.train_dataparser_outputs.image_filenames
 
-# 将一个长方体（cuboid）的参数化描述转换为其在三维空间中的顶点坐标
+    # 将一个长方体（cuboid）的参数化描述转换为其在三维空间中的顶点坐标
     def cuboid_to_3d_points(
-        self,
-        x: float,
-        y: float,
-        z: float,
-        yaw_angle: float,  # 长方体的旋转角度（绕垂直于地面的轴）
-        length: float,
-        height: float,
-        width: float,
+            self,
+            x: float,
+            y: float,
+            z: float,
+            yaw_angle: float,  # 长方体的旋转角度（绕垂直于地面的轴）
+            length: float,
+            height: float,
+            width: float,
     ):
         yaw = yaw_angle
         x = x
@@ -69,7 +70,7 @@ class Runner:
             dimension_x = length
             dimension_y = width
             dimension_z = height
-            Tr = transforms3d.euler.euler2mat(0, 0, yaw) # 将三个欧拉角（偏航角、俯仰角和横滚角）转换为一个旋转矩阵 Tr
+            Tr = transforms3d.euler.euler2mat(0, 0, yaw)  # 将三个欧拉角（偏航角、俯仰角和横滚角）转换为一个旋转矩阵 Tr
         else:  # y
             dimension_x = length
             dimension_y = height
@@ -77,55 +78,55 @@ class Runner:
             Tr = transforms3d.euler.euler2mat(0, yaw, 0)
         # compatible with kitti convention, cuboid position to box bottow center
         p0 = (
-            Tr @ np.array([[dimension_x / 2, dimension_y / 2, dimension_z]]).T
-            + translation
+                Tr @ np.array([[dimension_x / 2, dimension_y / 2, dimension_z]]).T
+                + translation
         )
 
         p1 = (
-            Tr @ np.array([[-dimension_x / 2, dimension_y / 2, dimension_z]]).T
-            + translation
+                Tr @ np.array([[-dimension_x / 2, dimension_y / 2, dimension_z]]).T
+                + translation
         )
 
         p2 = (
-            Tr @ np.array([[-dimension_x / 2, -dimension_y / 2, dimension_z]]).T
-            + translation
+                Tr @ np.array([[-dimension_x / 2, -dimension_y / 2, dimension_z]]).T
+                + translation
         )
 
         p3 = (
-            Tr @ np.array([[dimension_x / 2, -dimension_y / 2, dimension_z]]).T
-            + translation
+                Tr @ np.array([[dimension_x / 2, -dimension_y / 2, dimension_z]]).T
+                + translation
         )
 
         p4 = (
-            Tr @ np.array([[dimension_x / 2, dimension_y / 2, 0]]).T
-            + translation
+                Tr @ np.array([[dimension_x / 2, dimension_y / 2, 0]]).T
+                + translation
         )
 
         p5 = (
-            Tr @ np.array([[-dimension_x / 2, dimension_y / 2, 0]]).T
-            + translation
+                Tr @ np.array([[-dimension_x / 2, dimension_y / 2, 0]]).T
+                + translation
         )
 
         p6 = (
-            Tr @ np.array([[-dimension_x / 2, -dimension_y / 2, 0]]).T
-            + translation
+                Tr @ np.array([[-dimension_x / 2, -dimension_y / 2, 0]]).T
+                + translation
         )
 
         p7 = (
-            Tr @ np.array([[dimension_x / 2, -dimension_y / 2, 0]]).T
-            + translation
+                Tr @ np.array([[dimension_x / 2, -dimension_y / 2, 0]]).T
+                + translation
         )
 
         pts = np.hstack((p0, p1, p2, p3, p4, p5, p6, p7)).T
 
         return pts
 
-# ax：一个 Matplotlib 的 Axes3D 子图对象，用于绘制 3D 图形。
-# point3d：一个形状为 (8, 3) 的 NumPy 数组，包含了长方体的八个顶点坐标。
-# label：一个布尔值，指示是否在长方体的第一个顶点处添加标签。
-# tracking_id：一个布尔值，指示是否在长方体的第二个顶点处添加追踪 ID
+    # ax：一个 Matplotlib 的 Axes3D 子图对象，用于绘制 3D 图形。
+    # point3d：一个形状为 (8, 3) 的 NumPy 数组，包含了长方体的八个顶点坐标。
+    # label：一个布尔值，指示是否在长方体的第一个顶点处添加标签。
+    # tracking_id：一个布尔值，指示是否在长方体的第二个顶点处添加追踪 ID
     def plot_cuboid(
-        self, ax, point3d: np.ndarray, label: bool = None, tracking_id: bool = None
+            self, ax, point3d: np.ndarray, label: bool = None, tracking_id: bool = None
     ):
         point_order_to_plot = np.array([0, 1, 2, 3, 0, 4, 5, 6, 7, 4, 5, 1, 2, 6, 7, 3])
         ax.plot(
@@ -156,19 +157,30 @@ class Runner:
         for i, camera_pose in enumerate(camera_poses):
             print(i)
             sample = np.random.rand()
+            print(f"sample:{sample}")
+            if (
+                    sample < self.config.skip_probability
+                    or (
+                    self.config.selected_frames is not None
+                    and i not in self.config.selected_frames
+            )
+                    and self.config.show_image  # 如果设置了 show_image，那么当前迭代不会被跳过
+            ):
+                skipped.append(i)
+                continue
             # [n_frames, n_max_objects, [x,y,z,yaw_angle,track_id, 0]]
             # self.datamanager.train_dataset.metadata['obj_info'][0,0,0,:,:]
             if self.config.show_boxes and (
-                "obj_info" not in self.datamanager.train_dataset.metadata
-                or "obj_metadata" not in self.datamanager.train_dataset.metadata
+                    "obj_info" not in self.datamanager.train_dataset.metadata
+                    or "obj_metadata" not in self.datamanager.train_dataset.metadata
             ):
                 self.config.show_boxes = False
                 print("No object metadata found in this dataset")
 
             if self.config.show_boxes:
                 object_boxes = self.datamanager.train_dataset.metadata["obj_info"][
-                    i, 0, 0, :, :
-                ]
+                               i, 0, 0, :, :
+                               ]
                 object_boxes = object_boxes.reshape(
                     object_boxes.shape[0] // 2, object_boxes.shape[1] * 2
                 )
@@ -186,27 +198,19 @@ class Runner:
                     ) = self.datamanager.train_dataset.metadata["obj_metadata"][
                         int(track_id_line)
                     ]
-                    print(f'object ID:{int(object_id)}, class ID:{int(class_id)}, id_object:{object_idx}')
+                    # print(f'object ID:{int(object_id)}, class ID:{int(class_id)}, id_object:{object_idx}')
                     ax.plot([object_box[0]], [object_box[1]], [object_box[2]], "x")
                     ax.text(object_box[0], object_box[1], object_box[2], f'ID:{int(object_id)} idx:{object_idx}')
                     box_corners = self.cuboid_to_3d_points(
                         x, y, z, yaw_angle, length, height, width
                     )
                     keep_boxes += 1
-                    print(f'{float(x):.2f}, {float(y):.2f}, {float(z):.2f}, {float(yaw_angle):.2f}, {float(length):.2f}, {float(height):.2f}, {float(width):.2f}')
-                    
+                    # print(
+                    #     f'{float(x):.2f}, {float(y):.2f}, {float(z):.2f}, {float(yaw_angle):.2f}, {float(length):.2f}, {float(height):.2f}, {float(width):.2f}')
+
                     self.plot_cuboid(ax, box_corners)
-            if (
-                sample < self.config.skip_probability
-                or (
-                    self.config.selected_frames is not None
-                    and i not in self.config.selected_frames
-                )
-                and self.config.show_image
-            ):
-                skipped.append(i)
-                continue
-            print(f'frame:{i}, nb boxes: {keep_boxes}')
+
+            # print(f'frame:{i}, nb boxes: {keep_boxes}')
             # extract camera position and orientation
             camera_position = camera_pose[:3, 3]
             camera_orientation = camera_pose[:3, :3]
@@ -253,12 +257,12 @@ class Runner:
                 img = torch.cat([img, 0.5 * torch.ones((*img.shape[:-1], 1))], dim=-1)
 
                 coords = self.cameras.get_image_coords()[
-                    ::image_downsample_factor, ::image_downsample_factor
-                ]
+                         ::image_downsample_factor, ::image_downsample_factor
+                         ]
                 img = img[::image_downsample_factor, ::image_downsample_factor]
                 ray_bundle = self.cameras.generate_rays(camera_indices=i, coords=coords)
                 origins = (
-                    ray_bundle.origins + ray_bundle.directions * self.config.image_plane
+                        ray_bundle.origins + ray_bundle.directions * self.config.image_plane
                 ).reshape(*img.shape[:-1], 3)
                 xx, yy, zz = origins[..., 0], origins[..., 1], origins[..., 2]
 
@@ -304,24 +308,24 @@ class Runner:
             min_pos = min_pos.min() * 0.9
 
         # plot world coordinate axes
-        ax.plot([0, 1], [0, 0], [0, 0], color="r")
-        ax.plot([0, 0], [0, 1], [0, 0], color="g")
-        ax.plot([0, 0], [0, 0], [0, 1], color="b")
-
-        # set axis labels
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        ax.set_zlabel("Z")
-
-        # set axis limits
-        ax.set_xlim(min_pos, max_pos)
-        ax.set_ylim(min_pos, max_pos)
-        ax.set_zlim(min_pos, max_pos)
-
-        CONSOLE.log(f"skipped {len(skipped)} images.")
-
-        # show the plot
-        plt.show()
+        # ax.plot([0, 1], [0, 0], [0, 0], color="r")
+        # ax.plot([0, 0], [0, 1], [0, 0], color="g")
+        # ax.plot([0, 0], [0, 0], [0, 1], color="b")
+        #
+        # # set axis labels
+        # ax.set_xlabel("X")
+        # ax.set_ylabel("Y")
+        # ax.set_zlabel("Z")
+        #
+        # # set axis limits
+        # ax.set_xlim(min_pos, max_pos)
+        # ax.set_ylim(min_pos, max_pos)
+        # ax.set_zlim(min_pos, max_pos)
+        #
+        # CONSOLE.log(f"skipped {len(skipped)} images.")
+        #
+        # # show the plot
+        # plt.show()
 
 
 def main(config: VisConfig):
